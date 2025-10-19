@@ -1,0 +1,72 @@
+{
+    "name": "6amtech/laravel-electron-printing",
+    "description": "Silent background printing service for Laravel using Electron. Print HTML, Blade views, URLs, and PDFs to any printer without user interaction. Perfect for POS, restaurants, and e-commerce.",
+    "keywords": [
+        "laravel",
+        "electron",
+        "printing",
+        "silent-print",
+        "thermal-printer",
+        "pos",
+        "receipt",
+        "6amtech",
+        "background-printing",
+        "auto-print",
+        "printer",
+        "pdf-print",
+        "blade-print"
+    ],
+    "type": "library",
+    "license": "MIT",
+    "homepage": "https://github.com/mainulBUBT/laravel-electron-printing",
+    "support": {
+        "issues": "https://github.com/mainulBUBT/laravel-electron-printing/issues",
+        "source": "https://github.com/mainulBUBT/laravel-electron-printing",
+        "docs": "https://github.com/mainulBUBT/laravel-electron-printing#readme",
+        "email": "mainulislam3057@gmail.com"
+    },
+    "authors": [
+        {
+            "name": "Mainul Islam",
+            "email": "mainulislam3057@gmail.com",
+            "homepage": "https://github.com/mainulBUBT",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.4|^8.0|^8.1|^8.2|^8.3",
+        "illuminate/support": "^8.0|^9.0|^10.0|^11.0|^12.0",
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^6.0|^7.0|^8.0|^9.0",
+        "phpunit/phpunit": "^9.0|^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "LaravelElectronPrinting\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LaravelElectronPrinting\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LaravelElectronPrinting\\ElectronPrintingServiceProvider"
+            ],
+            "aliases": {
+                "ElectronPrint": "LaravelElectronPrinting\\Facades\\ElectronPrint"
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "preferred-install": "dist",
+        "optimize-autoloader": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
