@@ -1,0 +1,10 @@
+{
+  "port": 3000,
+  "listenIP": "0.0.0.0",
+  "websocket": {
+    "enabled": false,
+    "host": "ws://127.0.0.1:6001",
+    "channel": "printing",
+    "auth": {}
+  }
+}

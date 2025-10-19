@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6amTech Printing Service</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+        .app-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-badge {
+            background: #10b981;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            font-size: 24px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .info-item {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .printer-list {
+            list-style: none;
+        }
+
+        .printer-item {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .printer-item:hover {
+            border-color: #667eea;
+            background: #f1f5f9;
+        }
+
+        .printer-item.default {
+            border-color: #10b981;
+            background: #ecfdf5;
+        }
+
+        .printer-icon {
+            font-size: 28px;
+        }
+
+        .printer-info {
+            flex: 1;
+        }
+
+        .printer-name {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .printer-status {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .default-badge {
+            background: #10b981;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .activity-log {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-item {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .log-item:last-child {
+            border-bottom: none;
+        }
+
+        .log-time {
+            font-size: 11px;
+            color: #64748b;
+            min-width: 80px;
+        }
+
+        .log-message {
+            flex: 1;
+            font-size: 13px;
+            color: #334155;
+        }
+
+        .log-icon {
+            font-size: 16px;
+        }
+
+        .log-icon.success {
+            color: #10b981;
+        }
+
+        .log-icon.info {
+            color: #3b82f6;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .footer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 30px;
+            text-align: center;
+            font-size: 13px;
+            color: #64748b;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #5b21b6;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            background: #4c1d95;
+        }
+
+        .mode-btn {
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .mode-btn:active {
+            transform: translateY(0);
+        }
+
+        .mode-btn.mode-active {
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .mode-card {
+            display: block;
+            transition: transform 0.2s;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .mode-card:active {
+            transform: translateY(-2px);
+        }
+
+        .mode-card-content {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .mode-card:hover .mode-card-content {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-section">
+                <img src="https://i.postimg.cc/cHGHYGZF/6amtech.png" alt="6amMart Logo" class="logo">
+                <h1 class="app-title">6amTech Printing Service</h1>
+            </div>
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                <span>Service Running</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Service Info Card -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">⚙️</span>
+                    Service Information
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Status</div>
+                        <div class="info-value" style="color: #10b981;">Active</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Port</div>
+                        <div class="info-value">3000</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Local IP</div>
+                        <div class="info-value" style="font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                            <span id="localIP">Loading...</span>
+                            <button onclick="detectLocalIP()" style="background: #667eea; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">🔄</button>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Total Prints</div>
+                        <div class="info-value" id="totalPrints">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Network Configuration Card -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">🌐</span>
+                    Network Configuration
+                    <button class="btn" onclick="resetConfiguration()" style="margin-left: auto; background: #f59e0b; font-size: 12px; padding: 8px 16px;">
+                        🔄 Reset to Default
+                    </button>
+                </div>
+                <div style="margin-top: 15px;">
+                    <!-- Port Configuration -->
+                    <div style="background: #f8fafc; padding: 18px; border-radius: 12px; margin-bottom: 15px; border: 2px solid #e2e8f0; transition: all 0.3s;" id="portConfig">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #1e293b; margin-bottom: 10px; font-weight: 700;">
+                            <span style="font-size: 20px;">🔌</span>
+                            PORT NUMBER
+                        </label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input 
+                                type="number" 
+                                id="portNumber" 
+                                value="3000"
+                                placeholder="3000"
+                                min="1024"
+                                max="65535"
+                                style="flex: 1; padding: 12px 16px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; font-weight: 600; color: #1e293b; transition: all 0.3s;"
+                                onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102, 126, 234, 0.1)'"
+                                onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'"
+                            />
+                            <div style="background: white; padding: 12px 16px; border-radius: 8px; font-size: 12px; color: #64748b; border: 2px solid #e2e8f0; white-space: nowrap;">
+                                <strong>Current:</strong> <span id="currentPort" style="color: #10b981; font-weight: 700;">3000</span>
+                            </div>
+                        </div>
+                        <div style="font-size: 11px; color: #64748b; margin-top: 8px; padding-left: 4px;">
+                            💡 <strong>Tip:</strong> Use ports 3000-9999 for development. Avoid 80, 443, 8080 (commonly used).
+                        </div>
+                    </div>
+                    
+                    <!-- IP Configuration -->
+                    <div style="background: #f8fafc; padding: 18px; border-radius: 12px; margin-bottom: 15px; border: 2px solid #e2e8f0; transition: all 0.3s;" id="ipConfig">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #1e293b; margin-bottom: 10px; font-weight: 700;">
+                            <span style="font-size: 20px;">🌍</span>
+                            LISTEN IP ADDRESS
+                        </label>
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <button 
+                                onclick="setListenIP('0.0.0.0')" 
+                                style="flex: 1; padding: 12px; background: white; border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-size: 12px; font-weight: 600; color: #1e293b;"
+                                onmouseover="this.style.borderColor='#667eea'; this.style.background='#f0f4ff'"
+                                onmouseout="this.style.borderColor='#cbd5e1'; this.style.background='white'"
+                            >
+                                <div style="font-size: 16px; margin-bottom: 4px;">🌐</div>
+                                <div>All Networks</div>
+                                <div style="font-size: 10px; color: #64748b; margin-top: 2px;">0.0.0.0</div>
+                            </button>
+                            <button 
+                                onclick="setListenIP('127.0.0.1')" 
+                                style="flex: 1; padding: 12px; background: white; border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-size: 12px; font-weight: 600; color: #1e293b;"
+                                onmouseover="this.style.borderColor='#667eea'; this.style.background='#f0f4ff'"
+                                onmouseout="this.style.borderColor='#cbd5e1'; this.style.background='white'"
+                            >
+                                <div style="font-size: 16px; margin-bottom: 4px;">🏠</div>
+                                <div>Localhost Only</div>
+                                <div style="font-size: 10px; color: #64748b; margin-top: 2px;">127.0.0.1</div>
+                            </button>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="listenIP" 
+                            value="0.0.0.0"
+                            placeholder="0.0.0.0 or 127.0.0.1"
+                            style="width: 100%; padding: 12px 16px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 14px; font-weight: 600; color: #1e293b; font-family: 'Courier New', monospace; transition: all 0.3s;"
+                            onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102, 126, 234, 0.1)'"
+                            onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'"
+                        />
+                        <div style="font-size: 11px; color: #64748b; margin-top: 8px; padding-left: 4px;">
+                            💡 <strong>Tip:</strong> Use <strong>0.0.0.0</strong> to access from other devices on your network.
+                        </div>
+                    </div>
+                    
+                    <!-- Connection Mode Tabs -->
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <label style="font-size: 13px; color: #1e293b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                                🔗 Connection Mode
+                            </label>
+                            <div id="modeStatusBadge" style="padding: 4px 12px; background: #3b82f6; color: white; border-radius: 20px; font-size: 11px; font-weight: 600;">
+                                HTTP Active
+                            </div>
+                        </div>
+                        
+                        <!-- Tab Buttons -->
+                        <div style="display: flex; gap: 0; background: #f1f5f9; border-radius: 10px; padding: 4px; margin-bottom: 18px;">
+                            <button 
+                                id="tabHTTP"
+                                style="flex: 1; padding: 12px; background: white; color: #1e293b; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 8px;"
+                            >
+                                <span style="font-size: 18px;">🔌</span>
+                                <span>HTTP Mode</span>
+                            </button>
+                            <button 
+                                id="tabWebSocket"
+                                style="flex: 1; padding: 12px; background: transparent; color: #64748b; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;"
+                            >
+                                <span style="font-size: 18px;">🌐</span>
+                                <span>WebSocket</span>
+                            </button>
+                        </div>
+                        
+                        <!-- HTTP Mode Content -->
+                        <div id="httpModePanel" style="display: block;">
+                            <div style="padding: 18px; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 12px; border: 2px solid #3b82f6;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                    <div style="width: 40px; height: 40px; background: #3b82f6; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;">🔌</div>
+                                    <div>
+                                        <div style="font-size: 14px; font-weight: 700; color: #1e40af;">HTTP Mode</div>
+                                        <div style="font-size: 11px; color: #3b82f6;">Local Network Connection</div>
+                                    </div>
+                                </div>
+                                <div style="font-size: 12px; color: #475569; line-height: 1.7; padding-left: 50px;">
+                                    <div style="margin-bottom: 6px;">✓ Best for same network</div>
+                                    <div style="margin-bottom: 6px;">✓ Direct Laravel connection</div>
+                                    <div style="margin-bottom: 6px;">✓ No WebSocket server needed</div>
+                                    <div>✓ Fast and simple setup</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- WebSocket Mode Content -->
+                        <div id="websocketModePanel" style="display: none;">
+                            <div style="padding: 18px; background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border-radius: 12px; border: 2px solid #10b981;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                    <div style="width: 40px; height: 40px; background: #10b981; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;">🌐</div>
+                                    <div>
+                                        <div style="font-size: 14px; font-weight: 700; color: #065f46;">WebSocket Mode</div>
+                                        <div style="font-size: 11px; color: #10b981;">Remote Server Connection</div>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin: 16px 0; padding-left: 50px;">
+                                    <label style="display: block; font-size: 12px; color: #065f46; margin-bottom: 8px; font-weight: 600;">
+                                        📡 WebSocket Server URL
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="websocketHost" 
+                                        value="ws://localhost:6001"
+                                        placeholder="ws://localhost:6001 or wss://your-domain.com"
+                                        style="width: 100%; padding: 12px; border: 2px solid #10b981; border-radius: 8px; font-size: 13px; background: white; font-family: 'Courier New', monospace; color: #1e293b; font-weight: 500;"
+                                    />
+                                </div>
+                                
+                                <div style="font-size: 12px; color: #475569; line-height: 1.7; padding-left: 50px;">
+                                    <div style="margin-bottom: 6px;">✓ Supports <strong>ws://</strong> and <strong>wss://</strong> protocols</div>
+                                    <div style="margin-bottom: 6px;">✓ Uses <strong>printing</strong> channel (no conflict)</div>
+                                    <div style="margin-bottom: 6px;">✓ Auto-converts http/https to ws/wss</div>
+                                    <div style="margin-bottom: 6px;">✓ Secure (wss://) for production</div>
+                                    <div>✓ No ngrok or port forwarding needed</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action Buttons -->
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button 
+                            class="btn" 
+                            onclick="saveConfiguration()" 
+                            style="flex: 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-size: 14px; padding: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);"
+                        >
+                            <span style="font-size: 18px;">💾</span>
+                            <span>Save & Restart Service</span>
+                        </button>
+                        <button 
+                            class="btn" 
+                            onclick="killPortAndRestart()" 
+                            style="background: #ef4444; font-size: 14px; padding: 14px; display: flex; align-items: center; justify-content: center; gap: 8px;"
+                        >
+                            <span style="font-size: 18px;">⚡</span>
+                            <span>Force Restart</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Laravel Config Section -->
+                    <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border-left: 4px solid #3b82f6; margin-top: 15px;">
+                        <div style="font-size: 12px; font-weight: 600; color: #1e293b; margin-bottom: 8px;">
+                            📋 Laravel Configuration
+                        </div>
+                        <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">
+                            Add this to your Laravel <code>.env</code> file:
+                        </div>
+                        <div style="background: #1e293b; color: #10b981; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 11px; overflow-x: auto;">
+                            PRINT_SERVICE_URL=http://<span id="copyIP">YOUR_IP</span>:<span id="copyPort">3000</span><br>
+                            PRINT_SERVICE_ENABLED=true
+                        </div>
+                        <button class="btn" onclick="copyConfig()" style="margin-top: 10px; font-size: 12px;">
+                            📋 Copy Configuration
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Available Printers Card -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">🖨️</span>
+                    Available Printers
+                    <button class="btn" onclick="testPrint()" style="margin-left: auto; margin-right: 10px; background: #10b981;">Test Print</button>
+                    <button class="btn" onclick="refreshPrinters()">Refresh</button>
+                </div>
+                <ul class="printer-list" id="printerList">
+                    <li class="empty-state">
+                        <div class="empty-state-icon">🔄</div>
+                        <div>Loading printers...</div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Activity Log Card -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">📋</span>
+                    Recent Activity
+                </div>
+                <div class="activity-log" id="activityLog">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <div>No activity yet</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2025 6amTech. All rights reserved. | Printing Service v1.0.0</p>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer, clipboard } = require('electron');
+        const os = require('os');
+        const { app } = require('@electron/remote');
+        
+        // Persistent print count using localStorage
+        let printCount = parseInt(localStorage.getItem('printCount') || '0');
+        let currentMode = 'http'; // Default mode
+        let currentConfig = null; // Store config globally
+        let ws = null; // WebSocket connection
+
+        // Switch between HTTP and WebSocket mode with tab-based UI
+        function selectMode(mode) {
+            console.log('Switching to mode:', mode);
+            currentMode = mode;
+            
+            const httpTab = document.getElementById('tabHTTP');
+            const wsTab = document.getElementById('tabWebSocket');
+            const httpPanel = document.getElementById('httpModePanel');
+            const wsPanel = document.getElementById('websocketModePanel');
+            
+            if (!httpTab || !wsTab || !httpPanel || !wsPanel) {
+                console.error('Tab elements not found!');
+                return;
+            }
+            
+            // Update status badge
+            const statusBadge = document.getElementById('modeStatusBadge');
+            
+            if (mode === 'http') {
+                // Activate HTTP tab
+                httpTab.style.background = 'white';
+                httpTab.style.color = '#1e293b';
+                httpTab.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                
+                // Deactivate WebSocket tab
+                wsTab.style.background = 'transparent';
+                wsTab.style.color = '#64748b';
+                wsTab.style.boxShadow = 'none';
+                
+                // Show/hide panels
+                httpPanel.style.display = 'block';
+                wsPanel.style.display = 'none';
+                
+                // Update badge
+                if (statusBadge) {
+                    statusBadge.textContent = 'HTTP Active';
+                    statusBadge.style.background = '#3b82f6';
+                }
+                
+                console.log('✓ HTTP mode activated');
+                addLog('🔌 Switched to HTTP mode', 'info');
+            } else {
+                // Activate WebSocket tab
+                wsTab.style.background = 'white';
+                wsTab.style.color = '#1e293b';
+                wsTab.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                
+                // Deactivate HTTP tab
+                httpTab.style.background = 'transparent';
+                httpTab.style.color = '#64748b';
+                httpTab.style.boxShadow = 'none';
+                
+                // Show/hide panels
+                httpPanel.style.display = 'none';
+                wsPanel.style.display = 'block';
+                
+                // Update badge
+                if (statusBadge) {
+                    statusBadge.textContent = 'WebSocket Active';
+                    statusBadge.style.background = '#10b981';
+                }
+                
+                console.log('✓ WebSocket mode activated');
+                addLog('🌐 Switched to WebSocket mode - You can now edit the URL below', 'info');
+                
+                // Focus on the input field
+                const wsInput = document.getElementById('websocketHost');
+                if (wsInput) {
+                    setTimeout(() => {
+                        wsInput.focus();
+                        wsInput.select();
+                    }, 100);
+                }
+                
+                // Initialize WebSocket connection if enabled
+                if (currentConfig?.websocket?.enabled) {
+                    initWebSocket();
+                }
+            }
+        }
+        
+        // 6️⃣ WebSocket Connection Handler (supports ws:// and wss://)
+        function initWebSocket() {
+            let host = document.getElementById('websocketHost').value;
+            
+            if (!host || host.trim() === '') {
+                addLog('❌ WebSocket host is empty', 'error');
+                return;
+            }
+            
+            // Validate and normalize WebSocket URL
+            host = host.trim();
+            
+            // Check if it starts with ws:// or wss://
+            if (!host.startsWith('ws://') && !host.startsWith('wss://')) {
+                // If it starts with http:// or https://, convert it
+                if (host.startsWith('http://')) {
+                    host = host.replace('http://', 'ws://');
+                    addLog('ℹ️ Converted http:// to ws://', 'info');
+                } else if (host.startsWith('https://')) {
+                    host = host.replace('https://', 'wss://');
+                    addLog('ℹ️ Converted https:// to wss://', 'info');
+                } else {
+                    // Assume ws:// if no protocol specified
+                    host = 'ws://' + host;
+                    addLog('ℹ️ Added ws:// protocol', 'info');
+                }
+                // Update the input field with corrected URL
+                document.getElementById('websocketHost').value = host;
+            }
+            
+            // Close existing connection
+            if (ws) {
+                ws.close();
+            }
+            
+            try {
+                const protocol = host.startsWith('wss://') ? 'Secure (wss://)' : 'Unsecured (ws://)';
+                
+                // Add Laravel WebSockets path if not present
+                let wsUrl = host;
+                if (!host.includes('/app/')) {
+                    // Append Laravel WebSockets app path
+                    wsUrl = host + '/app/local?protocol=7&client=js&version=4.3.1';
+                    addLog(`ℹ️ Added Laravel WebSockets path: /app/local`, 'info');
+                }
+                
+                addLog(`🔄 Connecting to WebSocket [${protocol}]: ${wsUrl}`, 'info');
+                
+                ws = new WebSocket(wsUrl);
+                
+                // Add connection timeout
+                const connectionTimeout = setTimeout(() => {
+                    if (ws.readyState !== WebSocket.OPEN) {
+                        addLog('⏱️ WebSocket connection timeout - check if server is running', 'error');
+                        updateStatusBadge('Connection Timeout', '#ef4444');
+                        ws.close();
+                    }
+                }, 10000); // 10 second timeout
+                
+                ws.onopen = () => {
+                    clearTimeout(connectionTimeout);
+                    const secureIcon = host.startsWith('wss://') ? '🔒' : '🔓';
+                    addLog(`✅ ${secureIcon} WebSocket connected successfully`, 'success');
+                    updateStatusBadge('WebSocket Connected', '#10b981');
+                    
+                    // Subscribe to printing channel for Laravel WebSockets
+                    const subscribeMessage = JSON.stringify({
+                        event: 'pusher:subscribe',
+                        data: {
+                            channel: 'printing'
+                        }
+                    });
+                    ws.send(subscribeMessage);
+                    addLog('📡 Subscribed to "printing" channel', 'info');
+                };
+                
+                ws.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        if (data.type === 'print-job') {
+                            addLog(`📄 Print job received: ${data.jobId || 'unknown'}`, 'info');
+                            incrementPrintCount();
+                        }
+                    } catch (error) {
+                        console.error('WebSocket message error:', error);
+                    }
+                };
+                
+                ws.onerror = (error) => {
+                    addLog('❌ WebSocket error: Connection failed', 'error');
+                    updateStatusBadge('WebSocket Error', '#ef4444');
+                };
+                
+                ws.onclose = (event) => {
+                    const reason = event.reason || 'Connection closed';
+                    addLog(`🔌 WebSocket disconnected: ${reason}`, 'info');
+                    updateStatusBadge('WebSocket Disconnected', '#f59e0b');
+                };
+            } catch (error) {
+                addLog('❌ Failed to create WebSocket: ' + error.message, 'error');
+                updateStatusBadge('WebSocket Failed', '#ef4444');
+            }
+        }
+        
+        // Helper function to update status badge
+        function updateStatusBadge(text, color) {
+            const badge = document.getElementById('modeStatusBadge');
+            if (badge) {
+                badge.textContent = text;
+                badge.style.background = color;
+            }
+        }
+        
+        // Ensure function is globally accessible
+        window.selectMode = selectMode;
+
+        // Load printers on startup
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Add event listeners to tab buttons
+                console.log('Setting up tab event listeners...');
+                const httpTab = document.getElementById('tabHTTP');
+                const wsTab = document.getElementById('tabWebSocket');
+                
+                if (httpTab && wsTab) {
+                    httpTab.addEventListener('click', () => {
+                        console.log('HTTP tab clicked!');
+                        selectMode('http');
+                    });
+                    
+                    wsTab.addEventListener('click', () => {
+                        console.log('WebSocket tab clicked!');
+                        selectMode('websocket');
+                    });
+                    
+                    console.log('✓ Tab event listeners attached');
+                } else {
+                    console.error('Tab buttons not found!');
+                }
+                
+                await loadConfiguration();
+                detectLocalIP();
+                await loadPrinters();
+                addLog('Service started successfully', 'success');
+            } catch (error) {
+                console.error('Initialization error:', error);
+                addLog('Error during initialization', 'error');
+            }
+        });
+
+        // 1️⃣ Load configuration from main process with dynamic port/IP
+        async function loadConfiguration() {
+            try {
+                const config = await ipcRenderer.invoke('get-config');
+                currentConfig = config; // Store globally
+                
+                if (config) {
+                    const port = config.port || 3000;
+                    const listenIP = config.listenIP || '0.0.0.0';
+                    
+                    document.getElementById('portNumber').value = port;
+                    document.getElementById('listenIP').value = listenIP;
+                    document.getElementById('copyPort').textContent = port;
+                    document.getElementById('currentPort').textContent = port;
+                    
+                    // Load WebSocket config
+                    if (config.websocket) {
+                        document.getElementById('websocketHost').value = config.websocket.host || 'ws://localhost:6001';
+                        
+                        // Set mode based on config
+                        if (config.websocket.enabled) {
+                            selectMode('websocket');
+                        } else {
+                            selectMode('http');
+                        }
+                    } else {
+                        // Default to HTTP mode
+                        selectMode('http');
+                    }
+                    
+                    addLog(`Configuration loaded: Port ${config.port}, IP ${config.listenIP}`, 'info');
+                }
+            } catch (error) {
+                console.error('Error loading config:', error);
+                updateStatusBadge('Config Error', '#ef4444');
+                // Set defaults if config fails
+                document.getElementById('portNumber').value = 3000;
+                document.getElementById('listenIP').value = '0.0.0.0';
+                document.getElementById('copyPort').textContent = 3000;
+            }
+        }
+
+        // Save configuration and restart
+        async function saveConfiguration() {
+            const port = parseInt(document.getElementById('portNumber').value);
+            const listenIP = document.getElementById('listenIP').value;
+            const websocketEnabled = (currentMode === 'websocket');
+            const websocketHost = document.getElementById('websocketHost').value;
+            
+            // Validate port
+            if (port < 1024 || port > 65535) {
+                alert('❌ Invalid Port!\n\nPort must be between 1024 and 65535.');
+                return;
+            }
+            
+            // Validate IP
+            if (!listenIP || listenIP.trim() === '') {
+                alert('❌ Invalid IP!\n\nPlease enter a valid IP address.');
+                return;
+            }
+            
+            // Validate WebSocket host if enabled
+            if (websocketEnabled && (!websocketHost || websocketHost.trim() === '')) {
+                alert('❌ Invalid WebSocket Host!\n\nPlease enter a valid server URL.');
+                return;
+            }
+            
+            try {
+                const config = {
+                    port,
+                    listenIP,
+                    websocket: {
+                        enabled: websocketEnabled,
+                        host: websocketHost,
+                        channel: 'printing', // Fixed channel for printing
+                        auth: {}
+                    }
+                };
+                
+                const result = await ipcRenderer.invoke('save-config', config);
+                
+                if (result.success) {
+                    const mode = websocketEnabled ? 'WebSocket' : 'HTTP';
+                    addLog(`Configuration saved: Port ${port}, IP ${listenIP}, Mode: ${mode}`, 'success');
+                    alert(`✅ Configuration Saved!\n\nMode: ${mode}\nPort: ${port}\nIP: ${listenIP}\n${websocketEnabled ? 'WebSocket: ' + websocketHost : ''}\n\nThe app will now restart to apply changes.`);
+                    
+                    // 2️⃣ Use @electron/remote properly
+                    app.relaunch();
+                    app.exit();
+                } else {
+                    alert('❌ Error!\n\n' + result.message);
+                    updateStatusBadge('Save Failed', '#ef4444');
+                }
+            } catch (error) {
+                console.error('Error saving config:', error);
+                alert('❌ Error saving configuration!\n\n' + error.message);
+            }
+        }
+
+        // Quick set Listen IP
+        function setListenIP(ip) {
+            document.getElementById('listenIP').value = ip;
+            addLog(`Listen IP set to: ${ip}`, 'info');
+            
+            // Visual feedback
+            const ipConfig = document.getElementById('ipConfig');
+            ipConfig.style.borderColor = '#10b981';
+            ipConfig.style.background = '#ecfdf5';
+            setTimeout(() => {
+                ipConfig.style.borderColor = '#e2e8f0';
+                ipConfig.style.background = '#f8fafc';
+            }, 500);
+        }
+
+        // Reset configuration to defaults
+        async function resetConfiguration() {
+            const confirmed = confirm('🔄 Reset to Default?\n\nThis will reset:\n• Port: 3000\n• IP: 0.0.0.0\n• Mode: HTTP\n\nThe app will restart after reset.');
+            
+            if (!confirmed) return;
+            
+            try {
+                const defaultConfig = {
+                    port: 3000,
+                    listenIP: '0.0.0.0',
+                    websocket: {
+                        enabled: false,
+                        host: 'ws://localhost:6001',
+                        channel: 'printing',
+                        auth: {}
+                    }
+                };
+                
+                const result = await ipcRenderer.invoke('save-config', defaultConfig);
+                
+                if (result.success) {
+                    addLog('✅ Configuration reset to defaults', 'success');
+                    alert('✅ Reset Complete!\n\nConfiguration has been reset to defaults.\n\nThe app will now restart.');
+                    
+                    app.relaunch();
+                    app.exit();
+                } else {
+                    alert('❌ Reset Failed!\n\n' + result.message);
+                }
+            } catch (error) {
+                console.error('Error resetting config:', error);
+                alert('❌ Error resetting configuration!\n\n' + error.message);
+            }
+        }
+
+        // Force kill port and restart
+        async function killPortAndRestart() {
+            const confirmed = confirm('⚡ Force Restart?\n\nThis will:\n1. Kill any process using the current port\n2. Restart the service immediately\n\nUse this if the service is stuck or port is in use.\n\nContinue?');
+            
+            if (!confirmed) return;
+            
+            try {
+                addLog('⚡ Force restarting service...', 'info');
+                
+                // Show loading state
+                const btn = event.target;
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<span style="font-size: 18px;">⏳</span><span>Restarting...</span>';
+                btn.disabled = true;
+                btn.style.opacity = '0.6';
+                
+                // Request force restart from main process
+                const result = await ipcRenderer.invoke('force-restart');
+                
+                if (result && result.success) {
+                    addLog('✅ Force restart initiated', 'success');
+                    
+                    // Wait a moment then relaunch
+                    setTimeout(() => {
+                        app.relaunch();
+                        app.exit();
+                    }, 1000);
+                } else {
+                    // Fallback: just relaunch
+                    addLog('🔄 Performing standard restart', 'info');
+                    app.relaunch();
+                    app.exit();
+                }
+            } catch (error) {
+                console.error('Error during force restart:', error);
+                addLog('❌ Force restart error, attempting standard restart', 'error');
+                
+                // Fallback to standard restart
+                setTimeout(() => {
+                    app.relaunch();
+                    app.exit();
+                }, 500);
+            }
+        }
+
+        // Detect local IP address
+        function detectLocalIP() {
+            try {
+                const interfaces = os.networkInterfaces();
+                let localIP = 'localhost';
+                
+                if (interfaces && typeof interfaces === 'object') {
+                    // Find the first non-internal IPv4 address
+                    for (const name of Object.keys(interfaces)) {
+                        const ifaces = interfaces[name];
+                        if (Array.isArray(ifaces)) {
+                            for (const iface of ifaces) {
+                                // Check for IPv4 and not internal
+                                if (iface.family === 'IPv4' && !iface.internal && iface.address) {
+                                    localIP = iface.address;
+                                    break;
+                                }
+                            }
+                        }
+                        if (localIP !== 'localhost') break;
+                    }
+                }
+                
+                // Update UI elements
+                const localIPElement = document.getElementById('localIP');
+                const copyIPElement = document.getElementById('copyIP');
+                
+                if (localIPElement) {
+                    localIPElement.textContent = localIP;
+                }
+                if (copyIPElement) {
+                    copyIPElement.textContent = localIP;
+                }
+                
+                addLog(`Local IP detected: ${localIP}`, 'info');
+                
+                return localIP;
+            } catch (error) {
+                console.error('Error detecting local IP:', error);
+                addLog('Error detecting local IP, using localhost', 'error');
+                
+                // Set fallback values
+                const localIPElement = document.getElementById('localIP');
+                const copyIPElement = document.getElementById('copyIP');
+                
+                if (localIPElement) {
+                    localIPElement.textContent = 'localhost';
+                }
+                if (copyIPElement) {
+                    copyIPElement.textContent = 'localhost';
+                }
+                
+                return 'localhost';
+            }
+        }
+
+        // 4️⃣ Copy Laravel configuration using Electron clipboard
+        function copyConfig() {
+            const ip = document.getElementById('copyIP').textContent;
+            const port = document.getElementById('copyPort').textContent;
+            const config = `PRINT_SERVICE_URL=http://${ip}:${port}\nPRINT_SERVICE_ENABLED=true`;
+            
+            try {
+                clipboard.writeText(config);
+                addLog('✅ Laravel configuration copied to clipboard', 'success');
+                alert('✅ Copied to Clipboard!\n\nPaste this into your Laravel .env file:\n\n' + config);
+            } catch (err) {
+                console.error('Failed to copy:', err);
+                addLog('❌ Failed to copy to clipboard', 'error');
+                alert('Configuration:\n\n' + config + '\n\nPlease copy manually.');
+            }
+        }
+
+        // 1️⃣ Load available printers with dynamic port
+        async function loadPrinters() {
+            try {
+                const config = currentConfig || await ipcRenderer.invoke('get-config');
+                const port = config?.port || 3000;
+                
+                const response = await fetch(`http://localhost:${port}/printers`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                const printerList = document.getElementById('printerList');
+                
+                if (data.success && data.printers && data.printers.length > 0) {
+                    printerList.innerHTML = data.printers.map(printer => `
+                        <li class="printer-item ${printer.isDefault ? 'default' : ''}">
+                            <span class="printer-icon">🖨️</span>
+                            <div class="printer-info">
+                                <div class="printer-name">${printer.displayName || printer.name}</div>
+                                <div class="printer-status">${printer.description || 'Ready'}</div>
+                            </div>
+                            ${printer.isDefault ? '<span class="default-badge">DEFAULT</span>' : ''}
+                        </li>
+                    `).join('');
+                    
+                    addLog(`Found ${data.printers.length} printer(s)`, 'info');
+                } else {
+                    printerList.innerHTML = `
+                        <li class="empty-state">
+                            <div class="empty-state-icon">⚠️</div>
+                            <div>No printers found</div>
+                        </li>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading printers:', error);
+                updateStatusBadge('Service Down', '#ef4444');
+                addLog('❌ Error fetching printers: ' + error.message, 'error');
+                document.getElementById('printerList').innerHTML = `
+                    <li class="empty-state">
+                        <div class="empty-state-icon">❌</div>
+                        <div>Error loading printers</div>
+                    </li>
+                `;
+            }
+        }
+
+        // Refresh printers
+        async function refreshPrinters() {
+            addLog('Refreshing printer list...', 'info');
+            await loadPrinters();
+        }
+        
+        // 3️⃣ Increment print count with persistence
+        function incrementPrintCount() {
+            printCount++;
+            localStorage.setItem('printCount', printCount.toString());
+            
+            const totalPrintsEl = document.getElementById('totalPrints');
+            if (totalPrintsEl) {
+                totalPrintsEl.textContent = printCount;
+            }
+            
+            addLog('✅ Print job completed', 'success');
+        }
+        
+        // Initialize print count display
+        function initPrintCount() {
+            const totalPrintsEl = document.getElementById('totalPrints');
+            if (totalPrintsEl) {
+                totalPrintsEl.textContent = printCount;
+            }
+        }
+        
+        // 7️⃣ Test Print Button
+        async function testPrint() {
+            try {
+                const config = currentConfig || await ipcRenderer.invoke('get-config');
+                const port = config?.port || 3000;
+                
+                addLog('📄 Sending test print...', 'info');
+                
+                const response = await fetch(`http://localhost:${port}/print`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        html: '<h1>Test Print</h1><p>6amTech Printing Service</p><p>Test successful!</p>',
+                        printerName: null,
+                        options: {}
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    incrementPrintCount();
+                    addLog('✅ Test print sent successfully', 'success');
+                    alert('✅ Test Print Sent!\n\nCheck your default printer.');
+                } else {
+                    throw new Error(data.message || 'Print failed');
+                }
+            } catch (error) {
+                console.error('Test print error:', error);
+                addLog('❌ Test print failed: ' + error.message, 'error');
+                updateStatusBadge('Print Failed', '#ef4444');
+                alert('❌ Test Print Failed!\n\n' + error.message);
+            }
+        }
+
+        // 7️⃣ Add log entry with scroll to top
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('activityLog');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.innerHTML = `
+                <span class="log-time">${timestamp}</span>
+                <span class="log-message">${message}</span>
+            `;
+            
+            // Remove empty state if exists
+            const emptyState = logContainer.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+            
+            // Add new log at the top
+            logContainer.insertBefore(logEntry, logContainer.firstChild);
+            
+            // Scroll to top for real-time view
+            logContainer.scrollTop = 0;
+            
+            // Keep only last 50 entries
+            const entries = logContainer.querySelectorAll('.log-entry');
+            if (entries.length > 50) {
+                entries[entries.length - 1].remove();
+            }
+        }
+
+        // 5️⃣ Monitor print requests with dynamic port
+        setInterval(async () => {
+            try {
+                const config = currentConfig || await ipcRenderer.invoke('get-config');
+                const port = config?.port || 3000;
+                
+                const response = await fetch(`http://localhost:${port}/health`);
+                const data = await response.json();
+                
+                // Update status (you can extend this with actual metrics)
+                if (data.success) {
+                    // Service is healthy
+                }
+            } catch (error) {
+                console.error('Health check failed:', error);
+                updateStatusBadge('Service Down', '#ef4444');
+            }
+        }, 30000); // Check every 30 seconds
+
+        // Listen for print events
+        window.addEventListener('print-job', (event) => {
+            incrementPrintCount();
+        });
+        
+        // Initialize print count on load
+        window.addEventListener('DOMContentLoaded', () => {
+            initPrintCount();
+        });
+    </script>
+</body>
+</html>

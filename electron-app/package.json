@@ -1,0 +1,96 @@
+{
+  "name": "6amtech-printing-service",
+  "version": "1.0.0",
+  "description": "Background printing service for Laravel webapp",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.6amtech.printingservice",
+    "productName": "6amTech Printing Service",
+    "executableName": "6amTech-Printing-Service",
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "files": [
+      "main.js",
+      "index.html",
+      "websocket-client.js",
+      "config.json",
+      "assets/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.utilities",
+      "icon": "assets/icon.png",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "bundleVersion": "1.0.0",
+      "extendInfo": {
+        "CFBundleName": "6amTech Printing Service",
+        "CFBundleDisplayName": "6amTech Printing Service"
+      }
+    },
+    "win": {
+      "icon": "assets/icon.png",
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "publisherName": "6amTech",
+      "verifyUpdateCodeSignature": false
+    },
+    "linux": {
+      "icon": "assets/icon.png",
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Utility",
+      "executableName": "6amtech-printing-service",
+      "desktop": {
+        "Name": "6amTech Printing Service",
+        "Comment": "Background printing service for Laravel",
+        "Categories": "Utility;Office;"
+      }
+    },
+    "dmg": {
+      "title": "6amTech Printing Service",
+      "icon": "assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "6amTech Printing Service"
+    }
+  },
+  "keywords": [
+    "electron",
+    "print",
+    "silent-print",
+    "background-print"
+  ],
+  "author": "6amMart",
+  "license": "MIT",
+  "dependencies": {
+    "@electron/remote": "^2.1.3",
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "laravel-echo": "^1.16.1",
+    "pusher-js": "^8.4.0-rc2",
+    "socket.io-client": "^4.7.2"
+  },
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4"
+  }
+}
