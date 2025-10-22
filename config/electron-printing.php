@@ -42,6 +42,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Maximum Payload Size
+    |--------------------------------------------------------------------------
+    |
+    | Maximum size (in MB) for print payloads. Increase this for large PDFs
+    | or high-resolution images. The Electron service will read this value.
+    |
+    */
+
+    'max_payload_size' => env('PRINT_MAX_PAYLOAD_SIZE', 50),
+
+    /*
+    |--------------------------------------------------------------------------
     | Use WebSocket Broadcasting
     |--------------------------------------------------------------------------
     |

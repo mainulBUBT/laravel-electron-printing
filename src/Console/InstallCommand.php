@@ -56,11 +56,12 @@ class InstallCommand extends Command
         $this->line('PRINT_SERVICE_URL=http://localhost:3000');
         $this->line('PRINT_USE_WEBSOCKET=false');
         $this->line('PRINT_BROADCAST_CHANNEL=printing');
+        $this->line('PRINT_MAX_PAYLOAD_SIZE=50');
         
         $this->newLine();
         $this->info('📚 Next Steps:');
         $this->line('1. Update your .env file with the configuration above');
-        $this->line('2. Navigate to: cd electron-print-service');
+        $this->line('2. Navigate to: cd electron-print-service if you want to run background app by yourself');
         $this->line('3. Install dependencies: npm install');
         $this->line('4. Start the service: npm start');
         $this->line('5. Test printing: php artisan electron-printing:test');

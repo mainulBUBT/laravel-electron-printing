@@ -5,7 +5,6 @@ namespace LaravelElectronPrinting;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
-use LaravelElectronPrinting\Events\PrintJobCreated;
 
 class ElectronPrintService
 {
@@ -36,12 +35,6 @@ class ElectronPrintService
             return ['success' => false, 'message' => 'Print service is disabled'];
         }
 
-        // Check if WebSocket mode is enabled
-        if (config('electron-printing.use_websocket', false)) {
-            return $this->broadcastPrintJob($html, $printerName, $options);
-        }
-
-        // Use HTTP mode
         try {
             $response = $this->client->post($this->serviceUrl . '/print', [
                 'json' => [
@@ -57,8 +50,7 @@ class ElectronPrintService
                 Log::channel(config('electron-printing.logging.channel'))->info('Print job sent', [
                     'type' => 'html',
                     'printer' => $printerName,
-                    'success' => $result['success'] ?? false,
-                    'method' => 'http'
+                    'success' => $result['success'] ?? false
                 ]);
             }
 
@@ -70,53 +62,6 @@ class ElectronPrintService
                 Log::channel(config('electron-printing.logging.channel'))->error($error);
             }
 
-            return ['success' => false, 'message' => $error];
-        }
-    }
-
-    /**
-     * Broadcast print job via WebSocket
-     *
-     * @param string $html
-     * @param string|null $printerName
-     * @param array $options
-     * @return array
-     */
-    protected function broadcastPrintJob($html, $printerName = null, $options = [])
-    {
-        try {
-            $jobId = uniqid('print_', true);
-            
-            // Dispatch the PrintJobCreated event
-            event(new PrintJobCreated(
-                $html,
-                $printerName ?? config('electron-printing.default_printer'),
-                $this->resolveOptions($options),
-                $jobId
-            ));
-            
-            if (config('electron-printing.logging.enabled')) {
-                Log::channel(config('electron-printing.logging.channel'))->info('Print job broadcasted', [
-                    'type' => 'html',
-                    'printer' => $printerName,
-                    'jobId' => $jobId,
-                    'method' => 'websocket'
-                ]);
-            }
-            
-            return [
-                'success' => true,
-                'message' => 'Print job sent via WebSocket',
-                'jobId' => $jobId,
-                'method' => 'websocket'
-            ];
-        } catch (\Exception $e) {
-            $error = 'WebSocket broadcast error: ' . $e->getMessage();
-            
-            if (config('electron-printing.logging.enabled')) {
-                Log::channel(config('electron-printing.logging.channel'))->error($error);
-            }
-            
             return ['success' => false, 'message' => $error];
         }
     }
@@ -175,7 +120,7 @@ class ElectronPrintService
                 'json' => [
                     'url' => $url,
                     'printerName' => $printerName ?? config('electron-printing.default_printer'),
-                    'options' => array_merge(config('electron-printing.default_options', []), $options)
+                    'options' => $this->resolveOptions($options)
                 ]
             ]);
 
@@ -221,7 +166,7 @@ class ElectronPrintService
                 'json' => [
                     'pdfUrl' => $pdfUrl,
                     'printerName' => $printerName ?? config('electron-printing.default_printer'),
-                    'options' => $options
+                    'options' => $this->resolveOptions($options)
                 ]
             ]);
 
@@ -267,7 +212,7 @@ class ElectronPrintService
                 'json' => [
                     'pdfBase64' => $pdfBase64,
                     'printerName' => $printerName ?? config('electron-printing.default_printer'),
-                    'options' => $options
+                    'options' => $this->resolveOptions($options)
                 ]
             ]);
 

@@ -175,6 +175,19 @@ Print from any device on your network:
 PRINT_SERVICE_URL=http://192.168.1.100:3000
 ```
 
+### Large PDF/Payload Support
+
+For printing large PDFs or high-resolution images, increase the payload size limit:
+
+**Add to `.env`:**
+```env
+PRINT_MAX_PAYLOAD_SIZE=100  # Size in MB (default: 50MB)
+```
+
+The Laravel package will automatically sync this configuration with the Electron service. Restart the Electron app after changing this value.
+
+**Note:** Increase this value if you encounter `413 Payload Too Large` errors when printing large files.
+
 ### WebSocket Mode (Real-time)
 
 **1. Enable in `.env`:**
