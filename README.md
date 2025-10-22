@@ -80,8 +80,6 @@ PRINT_MAX_PAYLOAD_SIZE=50
 - **Standard Printers:** Install from manufacturer website
 - **Network Printers:** Configure network connection first
 
-**Similar to:** [rawilk/laravel-printing](https://github.com/rawilk/laravel-printing) - but this package uses Electron for cross-platform support.
-
 ### Step 5: Start the Electron Service
 
 #### Option A: Run from Source (Development)
