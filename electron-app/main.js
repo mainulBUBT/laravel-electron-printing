@@ -14,7 +14,8 @@ let httpServer = null;
 let wsClient = null;
 
 // Load configuration
-const configPath = path.join(__dirname, 'config.json');
+const userDataPath = app.getPath('userData');
+const configPath = path.join(userDataPath, 'config.json');
 let config = {
     port: 3000,
     listenIP: '0.0.0.0',
@@ -24,6 +25,11 @@ let config = {
         auth: {}
     }
 };
+
+// Ensure user data directory exists
+if (!fs.existsSync(userDataPath)) {
+    fs.mkdirSync(userDataPath, { recursive: true });
+}
 
 // Load config from file if exists
 if (fs.existsSync(configPath)) {
@@ -471,13 +477,6 @@ app.whenReady().then(() => {
     initializeWebSocket();
 });
 
-app.on('window-all-closed', () => {
-    // Keep the app running even if all windows are closed
-    // This is needed for the print service to continue running
-    if (process.platform !== 'darwin') {
-        // On macOS, we keep the app running
-    }
-});
 
 app.on('activate', () => {
     if (mainWindow === null) {
@@ -502,9 +501,9 @@ app.on('before-quit', (event) => {
     // Close HTTP server and release port
     if (httpServer) {
         console.log(`Closing HTTP server on port ${PORT}...`);
-        httpServer.close(() => {
-            console.log(`✅ Port ${PORT} released successfully`);
-        });
+        httpServer.close();
+        httpServer = null;
+        console.log(`✅ Port ${PORT} released successfully`);
     }
     
     // Destroy tray icon
@@ -513,29 +512,6 @@ app.on('before-quit', (event) => {
         tray.destroy();
         tray = null;
         console.log('✅ Tray icon destroyed');
-    }
-});
-
-// Handle app quit
-app.on('will-quit', (event) => {
-    console.log('Final cleanup before quit...');
-    
-    // Disconnect WebSocket
-    if (wsClient) {
-        wsClient.disconnect();
-        wsClient = null;
-    }
-    
-    // Force close server if still running
-    if (httpServer) {
-        httpServer.close();
-        httpServer = null;
-    }
-    
-    // Destroy tray
-    if (tray) {
-        tray.destroy();
-        tray = null;
     }
     
     console.log('✅ All services stopped');
