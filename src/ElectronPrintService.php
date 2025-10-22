@@ -5,6 +5,7 @@ namespace LaravelElectronPrinting;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Broadcast;
 
 class ElectronPrintService
 {
@@ -12,12 +13,14 @@ class ElectronPrintService
     protected $timeout;
     protected $enabled;
     protected $client;
+    protected $useWebsocket;
 
-    public function __construct($serviceUrl, $timeout = 30, $enabled = true)
+    public function __construct($serviceUrl, $timeout = 30, $enabled = true, $useWebsocket = false)
     {
         $this->serviceUrl = rtrim($serviceUrl, '/');
         $this->timeout = $timeout;
         $this->enabled = $enabled;
+        $this->useWebsocket = $useWebsocket ?? config('electron-printing.use_websocket', false);
         $this->client = new Client(['timeout' => $this->timeout]);
     }
 
@@ -33,6 +36,14 @@ class ElectronPrintService
     {
         if (!$this->enabled) {
             return ['success' => false, 'message' => 'Print service is disabled'];
+        }
+
+        if ($this->useWebsocket) {
+            return $this->broadcastPrintJob('html', [
+                'html' => $html,
+                'printerName' => $printerName ?? config('electron-printing.default_printer'),
+                'options' => $this->resolveOptions($options)
+            ]);
         }
 
         try {
@@ -115,6 +126,14 @@ class ElectronPrintService
             return ['success' => false, 'message' => 'Print service is disabled'];
         }
 
+        if ($this->useWebsocket) {
+            return $this->broadcastPrintJob('url', [
+                'url' => $url,
+                'printerName' => $printerName ?? config('electron-printing.default_printer'),
+                'options' => $this->resolveOptions($options)
+            ]);
+        }
+
         try {
             $response = $this->client->post($this->serviceUrl . '/print-url', [
                 'json' => [
@@ -161,6 +180,14 @@ class ElectronPrintService
             return ['success' => false, 'message' => 'Print service is disabled'];
         }
 
+        if ($this->useWebsocket) {
+            return $this->broadcastPrintJob('pdf_url', [
+                'pdfUrl' => $pdfUrl,
+                'printerName' => $printerName ?? config('electron-printing.default_printer'),
+                'options' => $this->resolveOptions($options)
+            ]);
+        }
+
         try {
             $response = $this->client->post($this->serviceUrl . '/print-pdf', [
                 'json' => [
@@ -205,6 +232,14 @@ class ElectronPrintService
     {
         if (!$this->enabled) {
             return ['success' => false, 'message' => 'Print service is disabled'];
+        }
+
+        if ($this->useWebsocket) {
+            return $this->broadcastPrintJob('pdf_base64', [
+                'pdfBase64' => $pdfBase64,
+                'printerName' => $printerName ?? config('electron-printing.default_printer'),
+                'options' => $this->resolveOptions($options)
+            ]);
         }
 
         try {
@@ -299,6 +334,50 @@ class ElectronPrintService
             return $data['success'] ?? false;
         } catch (GuzzleException $e) {
             return false;
+        }
+    }
+
+    /**
+     * Broadcast print job via WebSocket
+     *
+     * @param string $type
+     * @param array $payload
+     * @return array
+     */
+    protected function broadcastPrintJob($type, $payload)
+    {
+        try {
+            $jobId = uniqid('print_', true);
+            $channel = config('electron-printing.broadcast_channel', 'printing');
+            
+            $html = $payload['html'] ?? ($payload['url'] ?? ($payload['pdfUrl'] ?? ($payload['pdfBase64'] ?? '')));
+            $printerName = $payload['printerName'] ?? null;
+            $options = $payload['options'] ?? [];
+            
+            broadcast(new Events\PrintJobCreated($html, $printerName, $options, $jobId))
+                ->toOthers();
+            
+            if (config('electron-printing.logging.enabled')) {
+                Log::channel(config('electron-printing.logging.channel'))->info('Print job broadcasted', [
+                    'job_id' => $jobId,
+                    'type' => $type,
+                    'channel' => $channel
+                ]);
+            }
+
+            return [
+                'success' => true,
+                'message' => 'Print job queued for processing',
+                'job_id' => $jobId
+            ];
+        } catch (\Exception $e) {
+            $error = 'Broadcast error: ' . $e->getMessage();
+            
+            if (config('electron-printing.logging.enabled')) {
+                Log::channel(config('electron-printing.logging.channel'))->error($error);
+            }
+
+            return ['success' => false, 'message' => $error];
         }
     }
 }

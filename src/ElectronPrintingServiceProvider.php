@@ -23,7 +23,8 @@ class ElectronPrintingServiceProvider extends ServiceProvider
             return new ElectronPrintService(
                 config('electron-printing.service_url'),
                 config('electron-printing.timeout'),
-                config('electron-printing.enabled')
+                config('electron-printing.enabled'),
+                config('electron-printing.use_websocket', false)
             );
         });
     }
