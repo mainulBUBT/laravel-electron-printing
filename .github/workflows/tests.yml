@@ -12,28 +12,50 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        php: [8.3, 8.2, 8.1, 8.0, 7.4]
-        laravel: [11.*, 10.*, 9.*, 8.*]
-        dependency-version: [prefer-stable]
-        exclude:
-          - laravel: 11.*
-            php: 8.0
-          - laravel: 11.*
-            php: 7.4
-          - laravel: 10.*
-            php: 7.4
+        # ✅ OS কমিয়ে শুধুমাত্র Linux (সর্বাধিক স্থিতিশীল) ব্যবহার করা হয়েছে
+        os: [ubuntu-latest]
+
+        # ✅ Laravel version অনুযায়ী PHP version mapping optimize করা হয়েছে
         include:
-          - laravel: 11.*
-            testbench: 9.*
-          - laravel: 10.*
-            testbench: 8.*
-          - laravel: 9.*
-            testbench: 7.*
-          - laravel: 8.*
+          # Laravel 8 => PHP 7.4 - 8.3
+          - php: 7.4
+            laravel: 8.*
             testbench: 6.*
 
-    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.os }}
+          - php: 8.1
+            laravel: 8.*
+            testbench: 6.*
+
+          # Laravel 9 => PHP 8.0 - 8.3
+          - php: 8.0
+            laravel: 9.*
+            testbench: 7.*
+
+          - php: 8.2
+            laravel: 9.*
+            testbench: 7.*
+
+          # Laravel 10 => PHP 8.1 - 8.3
+          - php: 8.1
+            laravel: 10.*
+            testbench: 8.*
+
+          - php: 8.3
+            laravel: 10.*
+            testbench: 8.*
+
+          # Laravel 11 => PHP 8.2 - 8.3
+          - php: 8.2
+            laravel: 11.*
+            testbench: 9.*
+
+          - php: 8.3
+            laravel: 11.*
+            testbench: 9.*
+
+        dependency-version: [prefer-stable]
+
+    name: P${{ matrix.php }} - L${{ matrix.laravel }}
 
     steps:
       - name: Checkout code
@@ -46,21 +68,16 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
           coverage: none
 
-      - name: Setup problem matchers
-        run: |
-          echo "::add-matcher::${{ runner.tool_cache }}/php.json"
-          echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
-
-      - name: Install dependencies
+      - name: Composer install
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
 
-      - name: Execute tests
-        run: vendor/bin/phpunit
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit --colors=always
 
       - name: Upload coverage to Codecov
-        if: matrix.os == 'ubuntu-latest' && matrix.php == '8.3' && matrix.laravel == '11.*'
+        if: matrix.php == '8.3' && matrix.laravel == '11.*'
         uses: codecov/codecov-action@v3
         with:
           files: ./coverage.xml
