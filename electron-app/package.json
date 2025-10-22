@@ -6,9 +6,14 @@
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
+    "build:all": "electron-builder -mwl",
+    "build:all-x64": "electron-builder -mwl --x64",
+    "build:all-universal": "npm run build:all && npm run build:all-x64",
     "build:mac": "electron-builder --mac",
     "build:win": "electron-builder --win",
-    "build:linux": "electron-builder --linux"
+    "build:win-x64": "electron-builder --win --x64",
+    "build:linux": "electron-builder --linux",
+    "build:linux-x64": "electron-builder --linux --x64"
   },
   "build": {
     "appId": "com.6amtech.printingservice",
@@ -78,7 +83,15 @@
     "silent-print",
     "background-print"
   ],
-  "author": "6amMart",
+  "author": {
+    "name": "Mainul Islam",
+    "email": "mainulislam3057@gmail.com"
+  },
+  "homepage": "https://github.com/mainulBUBT/laravel-electron-printing",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mainulBUBT/laravel-electron-printing.git"
+  },
   "license": "MIT",
   "dependencies": {
     "@electron/remote": "^2.1.3",
