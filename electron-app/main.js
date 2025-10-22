@@ -19,6 +19,7 @@ const configPath = path.join(userDataPath, 'config.json');
 let config = {
     port: 3000,
     listenIP: '0.0.0.0',
+    maxPayloadSize: 50, // Default 50MB
     websocket: {
         enabled: false,
         host: 'https://6am.one',
@@ -46,7 +47,9 @@ const PORT = config.port;
 // Create Express server for receiving print requests
 const server = express();
 server.use(cors());
-server.use(express.json());
+// Use dynamic body size limit from config (default 50MB)
+server.use(express.json({ limit: `${config.maxPayloadSize || 50}mb` }));
+server.use(express.urlencoded({ limit: `${config.maxPayloadSize || 50}mb`, extended: true }));
 
 // Serve static files for the UI
 server.use('/assets', express.static(path.join(__dirname, 'assets')));
@@ -293,14 +296,26 @@ server.post('/print-pdf', async (req, res) => {
             await printWindow.loadURL(pdfData);
         }
 
-        // Wait for PDF to load
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        // Wait for PDF to load completely
+        await printWindow.webContents.executeJavaScript(`new Promise((resolve) => {
+            const finish = () => setTimeout(resolve, 500);
+            if (document.readyState === 'complete') {
+                finish();
+            } else {
+                window.addEventListener('load', finish);
+            }
+        })`, { timeout: 30000 });
 
-        // Print options for PDF
+        // Apply profile page size settings
         const printOptions = {
             silent: true,
-            printBackground: false, // PDFs don't need background
+            printBackground: false,
             deviceName: printerName || '',
+            pageSize: options?.pageSize || 'A4',
+            margins: options?.margins || options?.marginsType,
+            landscape: options?.landscape || false,
+            scaleFactor: options?.scaleFactor || 100,
+            preferCSSPageSize: options?.preferCSSPageSize !== false,
             ...options
         };
 
@@ -351,8 +366,37 @@ server.get('/health', (req, res) => {
     res.json({ 
         success: true, 
         message: 'Print service is running',
-        port: PORT
+        port: PORT,
+        maxPayloadSize: config.maxPayloadSize || 50
     });
+});
+
+// Update configuration endpoint (called by Laravel package)
+server.post('/config', (req, res) => {
+    try {
+        const { maxPayloadSize } = req.body;
+        
+        if (maxPayloadSize && typeof maxPayloadSize === 'number' && maxPayloadSize > 0) {
+            config.maxPayloadSize = maxPayloadSize;
+            fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+            
+            res.json({ 
+                success: true, 
+                message: 'Configuration updated. Please restart the service for changes to take effect.',
+                maxPayloadSize: config.maxPayloadSize
+            });
+        } else {
+            res.status(400).json({ 
+                success: false, 
+                message: 'Invalid maxPayloadSize value'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({ 
+            success: false, 
+            message: error.message 
+        });
+    }
 });
 
 // Start Express server
